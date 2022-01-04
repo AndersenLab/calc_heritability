@@ -40,8 +40,8 @@ if(params.debug) {
         
 } else if(params.gcp) { 
     // use the data directly from google on gcp
-    vcf_file = "gs://elegansvariation.org/releases/20210121/variation/WI.20210121.small.hard-filter.isotype.vcf.gz"
-    vcf_index = "gs://elegansvariation.org/releases/20210121/variation/WI.20210121.small.hard-filter.isotype.vcf.gz.tbi"
+    vcf_file = Channel.fromPath("gs://elegansvariation.org/releases/20210121/variation/WI.20210121.small.hard-filter.isotype.vcf.gz")
+    vcf_index = Channel.fromPath("gs://elegansvariation.org/releases/20210121/variation/WI.20210121.small.hard-filter.isotype.vcf.gz.tbi")
 
 } else if(!params.vcf) {
     // if there is no VCF date provided, pull the latest vcf from cendr.
@@ -242,7 +242,7 @@ process vcf_to_geno_matrix {
 
     //publishDir "${params.out}/Genotype_Matrix", mode: 'copy'
 
-    cpus 1
+    label "large"
 
     input:
         tuple file(vcf), file(index), file(strains)
@@ -301,6 +301,8 @@ process vcf_to_geno_matrix {
 
 process heritability {
 
+    label "medium"
+
 	publishDir "${params.out}/", mode: 'copy'
 
 	input:
@@ -333,6 +335,8 @@ process heritability {
 */
 
 process html_report {
+
+    label "small"
 
 	publishDir "${params.out}/", mode: 'copy'
 
