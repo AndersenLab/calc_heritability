@@ -378,11 +378,8 @@ if(args[2] == "fix"){
     for(t in unique(colnames(traits)[2:length(colnames(traits))])) {
         fixed_names <- traits %>%
             dplyr::select(strain, !!t)
-        trait_name <- fixed_names$trait[1]
-        colnames(fixed_names) <- c("strain", "phenotype", trait_name)
         fixed_names %>%
-            dplyr::select(-phenotype) %>%
-            readr::write_tsv(glue::glue("pr_{trait_name}.tsv"))
+            readr::write_tsv(glue::glue("pr_{t}.tsv"))
     }
 }
 

@@ -1,16 +1,20 @@
 #! usr/bin/env nextflow
 
-// if( !nextflow.version.matches('20.0+') ) {
-//     println "This workflow requires Nextflow version 20.0 or greater -- You are running version $nextflow.version"
-//     println "On QUEST, you can use `module load python/anaconda3.6; source activate /projects/b1059/software/conda_envs/nf20_env`"
-//     exit 1
-// }
+if( !nextflow.version.matches('20+') ) {
+    println "This workflow requires Nextflow version 20.0 or greater -- You are running version $nextflow.version"
+    println "On QUEST, you can use `module load python/anaconda3.6; source activate /projects/b1059/software/conda_envs/nf20_env`"
+    exit 1
+}
 
 nextflow.preview.dsl=2
 
 date = new Date().format( 'yyyyMMdd' )
-reps = 10000
-
+// reps = 10000
+reps = 500
+params.binDir = "${workflow.projectDir}"
+params.species = "c_elegans"
+params.fix = "fix"
+params.maf = 0.05
 
 /*
 ~ ~ ~ > * Parameters
@@ -32,12 +36,12 @@ if(params.debug) {
     params.traitfile = "${params.binDir}/test_data/ExampleTraitData.csv"
 
     // lower number of reps for debug
-    reps = 100
+    reps = 10
         
 } else if(params.gcp) { 
     // use the data directly from google on gcp
-    vcf_file = "gs://elegansvariation.org/releases/20210121/variation/WI.20210121.hard-filter.isotype.vcf.gz"
-    vcf_index = "gs://elegansvariation.org/releases/20210121/variation/WI.20210121.hard-filter.isotype.vcf.gz.tbi"
+    vcf_file = "gs://elegansvariation.org/releases/20210121/variation/WI.20210121.small.hard-filter.isotype.vcf.gz"
+    vcf_index = "gs://elegansvariation.org/releases/20210121/variation/WI.20210121.small.hard-filter.isotype.vcf.gz.tbi"
 
 } else if(!params.vcf) {
     // if there is no VCF date provided, pull the latest vcf from cendr.
@@ -48,13 +52,54 @@ if(params.debug) {
     // use the vcf data from QUEST when a cendr date is provided
 
     // Check that params.vcf is valid
-    if("${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531") {
-        vcf_file = Channel.fromPath("/projects/b1059/data/c_elegans/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.hard-filter.isotype.vcf.gz")
-        vcf_index = Channel.fromPath("/projects/b1059/data/c_elegans/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.hard-filter.isotype.vcf.gz.tbi")
-
+    if("${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531" || "${params.vcf}" == "20210901" || "${params.vcf}" == "20210803") {
+        // if("${params.vcf}" in ["20210121", "20200815", "20180527", "20170531", "20210901"]) {
+        // check to make sure 20210901 is tropicalis
+        if("${params.vcf}" == "20210901") {
+            if("${params.species}" == "c_elegans" || "${params.species}" == "c_briggsae") {
+                println """
+                Error: VCF file (${params.vcf}) does not match species ${params.species} (should be c_tropicalis). Please enter a new vcf date or a new species to continue.
+                """
+                System.exit(1)
+            }
+        }
+        // check to make sure vcf matches species for briggsae
+        if("${params.vcf}" == "20210803") {
+            if("${params.species}" == "c_elegans" || "${params.species}" == "c_tropicalis") {
+                println """
+                Error: VCF file (${params.vcf}) does not match species ${params.species} (should be c_briggsae). Please enter a new vcf date or a new species to continue.
+                """
+                System.exit(1)
+            }
+        }
+        // check to make sure vcf matches species for elegans
+        if("${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531") {
+            if("${params.species}" == "c_briggsae" || "${params.species}" == "c_tropicalis") {
+                println """
+                Error: VCF file (${params.vcf}) does not match species ${params.species} (should be c_elegans). Please enter a new vcf date or a new species to continue.
+                """
+                System.exit(1)
+            }
+        }
+        // use the vcf data from QUEST when a cendr date is provided
+        vcf_file = Channel.fromPath("/projects/b1059/data/${params.species}/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz")
+        vcf_index = Channel.fromPath("/projects/b1059/data/${params.species}/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz.tbi")
     } else {
-        println "Error! Cannot find ${params.vcf}.vcf. Please provide a valid CeNDR release date (20210121, 20200815, 20180527, or 20170531)."
-        exit 1
+        // check that vcf file exists, if it does, use it. If not, throw error
+        if (!file("${params.vcf}").exists()) {
+            println """
+            Error: VCF file (${params.vcf}) does not exist. Please provide a valid filepath or a valid CeNDR release date (i.e. 20210121)
+            """
+            System.exit(1)
+        } else {
+            // if it DOES exist
+            println """
+            WARNING: Using a non-CeNDR VCF for analysis. 
+            """
+            vcf_file = Channel.fromPath("${params.vcf}")
+            vcf_index = Channel.fromPath("${params.vcf}.tbi")
+
+        }
     }
 }
 
@@ -75,10 +120,19 @@ workflow {
 	}
 
 	// Fix strain names
-    Channel.fromPath("${params.traitfile}")
-        .combine(Channel.fromPath("${params.binDir}/bin/strain_isotype_lookup.tsv"))
-        .combine(Channel.fromPath("${params.binDir}/bin/Fix_Isotype_names_bulk_h2.R")) | fix_strain_names_bulk        
-
+    // allow for non c_elegans, briggsae, tropicalis species
+    if(!("${params.species}" == "c_elegans" || "${params.species}" == "c_tropicalis" || "${params.species}" == "c_briggsae")) {
+        Channel.fromPath("${params.traitfile}")
+            .combine(Channel.fromPath("${params.binDir}/input_data/${params.species}/strain_isotype_lookup.tsv"))
+            .combine(Channel.fromPath("${params.binDir}/bin/Fix_Isotype_names_bulk_h2.R"))
+            .combine(Channel.from("false")) | fix_strain_names_bulk 
+    } else {
+        Channel.fromPath("${params.traitfile}")
+            .combine(Channel.fromPath("${params.binDir}/input_data/${params.species}/strain_isotype_lookup.tsv"))
+            .combine(Channel.fromPath("${params.binDir}/bin/Fix_Isotype_names_bulk_h2.R"))
+            .combine(Channel.from("${params.fix}")) | fix_strain_names_bulk 
+    }
+           
     traits_to_map = fix_strain_names_bulk.out.fixed_strain_phenotypes
             .flatten()
             .map { file -> tuple(file.baseName.replaceAll(/pr_/,""), file) }
@@ -159,7 +213,7 @@ process fix_strain_names_bulk {
     publishDir "${params.out}/Phenotypes", mode: 'copy', pattern: "strain_issues.txt"
 
     input:
-        tuple file(phenotypes), file(isotype_lookup), file(fix_isotype_script)
+        tuple file(phenotypes), file(isotype_lookup), file(fix_isotype_script), val(fix)
 
     output:
         path "pr_*.tsv", emit: fixed_strain_phenotypes 
@@ -169,7 +223,7 @@ process fix_strain_names_bulk {
     """
         # add R_libpath to .libPaths() into the R script, create a copy into the NF working directory 
         echo ".libPaths(c(\\"${params.R_libpath}\\", .libPaths() ))" | cat - ${fix_isotype_script} > Fix_Isotype_names_bulk.R 
-        Rscript --vanilla Fix_Isotype_names_bulk.R ${phenotypes} fix $isotype_lookup
+        Rscript --vanilla Fix_Isotype_names_bulk.R ${phenotypes} $fix $isotype_lookup
     """
 
 }
@@ -197,24 +251,25 @@ process vcf_to_geno_matrix {
         file("Genotype_Matrix.tsv") 
 
     """
-        bcftools view -S ${strains} ${vcf} |\\
-        bcftools filter -i N_MISSING=0 -Oz -o Phenotyped_Strain_VCF.vcf.gz
+        bcftools view -S ${strains} -Ou ${vcf} |\\
+        bcftools filter -i N_MISSING=0 -Oz --threads 5 -o Phenotyped_Strain_VCF.vcf.gz
         tabix -p vcf Phenotyped_Strain_VCF.vcf.gz
         plink --vcf Phenotyped_Strain_VCF.vcf.gz \\
-            --snps-only \\
-            --biallelic-only \\
-            --maf 0.05 \\
-            --set-missing-var-ids @:# \\
-            --indep-pairwise 50 10 0.8 \\
-            --geno \\
-            --allow-extra-chr
+              --threads 5 \\
+              --snps-only \\
+              --biallelic-only \\
+              --maf ${params.maf} \\
+              --set-missing-var-ids @:# \\
+              --indep-pairwise 50 10 0.8 \\
+              --geno \\
+              --allow-extra-chr
         awk -F":" '\$1=\$1' OFS="\\t" plink.prune.in | \\
         sort -k1,1d -k2,2n > markers.txt
         bcftools query -l Phenotyped_Strain_VCF.vcf.gz |\\
         sort > sorted_samples.txt 
         bcftools view -v snps \\
         -S sorted_samples.txt \\
-        -R markers.txt \\
+        -R markers.txt -Ou \\
         Phenotyped_Strain_VCF.vcf.gz |\\
         bcftools query --print-header -f '%CHROM\\t%POS\\t%REF\\t%ALT[\\t%GT]\\n' |\\
         sed 's/[[# 0-9]*]//g' |\\
