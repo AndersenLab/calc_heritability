@@ -12,7 +12,8 @@ args <- commandArgs(trailingOnly = TRUE)
 #' Resolve strain names to isotypes
 resolve_isotypes <- function(...) {
     
-    isotype_lookup = data.table::fread(args[3])
+    isotype_lookup = data.table::fread(args[3])  %>%
+        dplyr::bind_rows(data.frame(strain = "PD1074", isotype = "N2"))
     strains <- unlist(list(...))
     
     purrr::map_chr(strains, function(x) {
@@ -219,7 +220,7 @@ process_phenotypes <- function(df,
     strain_isotypes_db <- data.table::fread(args[3])
     # identify strains that were phenotyped, but are not part of an isotype
     non_isotype_strains <- dplyr::filter(df,
-                                         !(strain %in% strain_isotypes_db$strain),
+                                         !(strain %in% c(strain_isotypes_db$strain, "PD1074")),
                                          !(strain %in% strain_isotypes_db$isotype))
     # remove any strains identified to not fall into an isotype
     if ( nrow(non_isotype_strains) > 0 ) {

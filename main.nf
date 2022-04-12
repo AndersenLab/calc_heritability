@@ -10,7 +10,7 @@ nextflow.preview.dsl=2
 
 date = new Date().format( 'yyyyMMdd' )
 // reps = 10000
-reps = 500
+params.reps = 500
 params.binDir = "${workflow.projectDir}"
 params.species = "c_elegans"
 params.fix = "fix"
@@ -31,28 +31,31 @@ if(params.debug) {
     // debug for now with small vcf
     params.vcf = "330_TEST.vcf.gz"
 
-    vcf_file = Channel.fromPath("${params.binDir}/test_data/330_TEST.vcf.gz")
-    vcf_index = Channel.fromPath("${params.binDir}/test_data/330_TEST.vcf.gz.tbi")
-    params.traitfile = "${params.binDir}/test_data/ExampleTraitData.csv"
+    vcf_file = Channel.fromPath("${params.binDir}/input_data/test_data/330_TEST.vcf.gz")
+    vcf_index = Channel.fromPath("${params.binDir}/input_data/test_data/330_TEST.vcf.gz.tbi")
+    params.traitfile = "${params.binDir}/input_data/test_data/ExampleTraitData.csv"
 
     // lower number of reps for debug
     reps = 10
         
 } else if(params.gcp) { 
     // use the data directly from google on gcp
-    vcf_file = Channel.fromPath("gs://elegansvariation.org/releases/20210121/variation/WI.20210121.small.hard-filter.isotype.vcf.gz")
-    vcf_index = Channel.fromPath("gs://elegansvariation.org/releases/20210121/variation/WI.20210121.small.hard-filter.isotype.vcf.gz.tbi")
+    // vcf_file = Channel.fromPath("gs://elegansvariation.org/releases/20220216/variation/WI.20220216.small.hard-filter.isotype.vcf.gz")
+    // vcf_index = Channel.fromPath("gs://elegansvariation.org/releases/20220216/variation/WI.20220216.small.hard-filter.isotype.vcf.gz.tbi")
+
+    vcf_file = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/c_elegans/20220216/variation//WI.20220216.small.hard-filter.isotype.vcf.gz")
+    vcf_index = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/c_elegans/20220216/variation//WI.20220216.small.hard-filter.isotype.vcf.gz.tbi")
 
 } else if(!params.vcf) {
     // if there is no VCF date provided, pull the latest vcf from cendr.
-    params.vcf = "20210121"
+    params.vcf = "20220216"
     download_vcf = true
     
 } else {
     // use the vcf data from QUEST when a cendr date is provided
 
     // Check that params.vcf is valid
-    if("${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531" || "${params.vcf}" == "20210901" || "${params.vcf}" == "20210803") {
+    if("${params.vcf}" == "20220216" || "${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531" || "${params.vcf}" == "20210901" || "${params.vcf}" == "20210803") {
         // if("${params.vcf}" in ["20210121", "20200815", "20180527", "20170531", "20210901"]) {
         // check to make sure 20210901 is tropicalis
         if("${params.vcf}" == "20210901") {
@@ -73,7 +76,7 @@ if(params.debug) {
             }
         }
         // check to make sure vcf matches species for elegans
-        if("${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531") {
+        if("${params.vcf}" == "20220216" || "${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531") {
             if("${params.species}" == "c_briggsae" || "${params.species}" == "c_tropicalis") {
                 println """
                 Error: VCF file (${params.vcf}) does not match species ${params.species} (should be c_elegans). Please enter a new vcf date or a new species to continue.
@@ -146,7 +149,7 @@ workflow {
     // calclate heritability and generate report output
     traits_to_map 
     	.combine(vcf_to_geno_matrix.out)
-        .combine(Channel.from(reps))
+        .combine(Channel.from("${params.reps}"))
         .combine(Channel.fromPath("${params.binDir}/bin/20210716_H2_script.R")) | heritability
 
     //generate html report
@@ -240,7 +243,7 @@ process fix_strain_names_bulk {
 
 process vcf_to_geno_matrix {
 
-    //publishDir "${params.out}/Genotype_Matrix", mode: 'copy'
+    publishDir "${params.out}/Genotype_Matrix", mode: 'copy'
 
     label "large"
 
