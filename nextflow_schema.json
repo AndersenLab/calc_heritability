@@ -18,65 +18,87 @@
                     "default": "${params.outdir}/pipeline_info",
                     "fa_icon": "fas fa-cogs",
                     "hidden": true
+                },
+                "gcp": {
+                    "type": "string",
+                    "default": "false",
+                    "hidden": true
+                },
+                "binDir": {
+                    "type": "string",
+                    "default": "${workflow.projectDir}",
+                    "hidden": true
+                },
+                "R_libpath": {
+                    "type": "string",
+                    "hidden": true
                 }
             }
+        },
+        "input_output": {
+            "title": "Input/Output",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "out": {
+                    "type": "string",
+                    "default": "Analysis_Results",
+                    "description": "Output directory"
+                },
+                "vcf": {
+                    "type": "string",
+                    "default": "20220216",
+                    "description": "data release date"
+                },
+                "species": {
+                    "type": "string",
+                    "default": "c_elegans"
+                },
+                "traitfile": {
+                    "type": "string",
+                    "default": "/projects/b1059/projects/Joy/test_hert/ExampleTraitData.csv"
+                }
+            },
+            "required": [
+                "vcf",
+                "species",
+                "traitfile"
+            ],
+            "fa_icon": "fas fa-terminal"
+        },
+        "parameters": {
+            "title": "Parameters",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "reps": {
+                    "type": "number",
+                    "default": 500
+                },
+                "fix": {
+                    "type": "string",
+                    "default": "fix",
+                    "hidden": true
+                },
+                "maf": {
+                    "type": "number",
+                    "default": 0.05
+                }
+            },
+            "fa_icon": "fas fa-balance-scale-right"
         }
     },
     "allOf": [
         {
             "$ref": "#/definitions/generic_options"
+        },
+        {
+            "$ref": "#/definitions/input_output"
+        },
+        {
+            "$ref": "#/definitions/parameters"
         }
-    ],
-    "properties": {
-        "out": {
-            "type": "string",
-            "default": "Analysis_Results",
-            "description": "Output directory"
-        },
-        "vcf": {
-            "type": "string",
-            "default": "20220216",
-            "description": "data release date"
-        },
-        "gcp": {
-            "type": "string",
-            "default": "false",
-            "hidden": true
-        },
-        "reps": {
-            "type": "number",
-            "default": 500
-        },
-        "binDir": {
-            "type": "string",
-            "default": "${workflow.projectDir}",
-            "hidden": true
-        },
-        "species": {
-            "type": "string",
-            "default": "c_elegans"
-        },
-        "fix": {
-            "type": "string",
-            "default": "fix",
-            "hidden": true
-        },
-        "maf": {
-            "type": "number",
-            "default": 0.05
-        },
-        "R_libpath": {
-            "type": "string",
-            "hidden": true
-        },
-        "traitfile": {
-            "type": "string",
-            "default": "/projects/b1059/projects/Joy/test_hert/ExampleTraitData.csv"
-        }
-    },
-    "required": [
-        "traitfile",
-        "vcf",
-        "species"
     ]
 }
