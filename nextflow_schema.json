@@ -29,7 +29,7 @@
                 "traitfile": {
                     "type": "string",
                     "default": "/projects/b1059/projects/Joy/test_hert/ExampleTraitData.csv",
-                    "description": "A tab-delimited formatted (.tsv) file that contains trait information"
+                    "description": "Full path to a tab-delimited formatted (.tsv) file containing trait information"
                 }
             },
             "required": [
