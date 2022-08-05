@@ -14,20 +14,22 @@
                 "out": {
                     "type": "string",
                     "default": "Analysis_Results",
-                    "description": "Output directory"
+                    "description": "A user-specified output directory name"
                 },
                 "vcf": {
                     "type": "string",
                     "default": "20220216",
-                    "description": "data release date"
+                    "description": "CeNDR release date for the VCF file with variant data"
                 },
                 "species": {
                     "type": "string",
-                    "default": "c_elegans"
+                    "default": "c_elegans",
+                    "description": "Options: c_elegans, c_briggsae, or c_tropicalis"
                 },
                 "traitfile": {
                     "type": "string",
-                    "default": "/projects/b1059/projects/Joy/test_hert/ExampleTraitData.csv"
+                    "default": "/projects/b1059/projects/Joy/test_hert/ExampleTraitData.csv",
+                    "description": "A tab-delimited formatted (.tsv) file that contains trait information"
                 }
             },
             "required": [
