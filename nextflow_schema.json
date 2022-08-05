@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com//Users/grad/Documents/GitHub/calc_heritability/master/nextflow_schema.json",
+    "title": "calc_heritability pipeline parameters",
+    "description": "",
+    "type": "object",
+    "properties": {
+        "out": {
+            "type": "string",
+            "default": "Analysis_Results"
+        },
+        "vcf": {
+            "type": "string",
+            "default": "20220216"
+        },
+        "reps": {
+            "type": "string",
+            "default": "500"
+        },
+        "binDir": {
+            "type": "string",
+            "default": "None",
+            "hidden": true
+        },
+        "species": {
+            "type": "string",
+            "default": "c_elegans"
+        },
+        "fix": {
+            "type": "string",
+            "default": "None",
+            "hidden": true
+        },
+        "maf": {
+            "type": "string",
+            "default": "0.5"
+        },
+        "traitfile": {
+            "type": "string",
+            "default": "None"
+        }
+    },
+    "required": [
+        "species",
+        "traitfile",
+        "vcf",
+        "out"
+    ]
+}
