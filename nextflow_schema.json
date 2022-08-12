@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/./master/nextflow_schema.json",
-    "title": "andersenlab/calc_heritability pipeline parameters",
+    "title": "calc_heritability-nf pipeline parameters",
     "description": "",
     "type": "object",
     "definitions": {
@@ -13,8 +13,8 @@
             "properties": {
                 "out": {
                     "type": "string",
-                    "default": "Analysis_Results",
-                    "description": "A user-specified output directory name"
+                    "default": "Heritability_Results",
+                    "description": "Output directory name"
                 },
                 "vcf": {
                     "type": "string",
@@ -23,13 +23,16 @@
                 },
                 "species": {
                     "type": "string",
-                    "default": "c_elegans",
-                    "description": "Options: c_elegans, c_briggsae, or c_tropicalis"
+                    "enum": [
+                        "c_elegans",
+                        "c_briggsae",
+                        "c_tropicalis"
+                    ],
+                    "default": "c_elegans"
                 },
                 "traitfile": {
                     "type": "string",
-                    "default": "/projects/b1059/projects/Joy/test_hert/ExampleTraitData.csv",
-                    "description": "Full path to a tab-delimited formatted (.tsv) file containing trait information"
+                    "description": "Full path to a file containing trait information"
                 }
             },
             "required": [
@@ -47,7 +50,8 @@
             "properties": {
                 "reps": {
                     "type": "number",
-                    "default": 500
+                    "default": 500,
+                    "hidden": true
                 },
                 "fix": {
                     "type": "string",
@@ -56,7 +60,8 @@
                 },
                 "maf": {
                     "type": "number",
-                    "default": 0.05
+                    "default": 0.05,
+                    "hidden": true
                 }
             },
             "fa_icon": "fas fa-balance-scale-right"

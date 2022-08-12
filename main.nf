@@ -29,14 +29,14 @@ if(params.debug) {
         *** Using debug mode ***
     """
     // debug for now with small vcf
-    params.vcf = "330_TEST.vcf.gz"
+    params.vcf = "WI.20220216.small.hard-filter.isotype.vcf.gz"
 
-    vcf_file = Channel.fromPath("${params.binDir}/input_data/test_data/330_TEST.vcf.gz")
-    vcf_index = Channel.fromPath("${params.binDir}/input_data/test_data/330_TEST.vcf.gz.tbi")
-    params.traitfile = "${params.binDir}/input_data/test_data/ExampleTraitData.csv"
+    vcf_file = Channel.fromPath("${params.binDir}/input_data/test_data/WI.20220216.small.hard-filter.isotype.vcf.gz")
+    vcf_index = Channel.fromPath("${params.binDir}/input_data/test_data/WI.20220216.small.hard-filter.isotype.vcf.gz.tbi")
+    params.traitfile = "${params.binDir}/input_data/test_data/ExampleTraitData.tsv"
 
     // lower number of reps for debug
-    reps = 10
+    // reps = 10
         
 } else if(params.gcp) { 
     // use the data directly from google on gcp
