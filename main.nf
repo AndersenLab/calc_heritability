@@ -31,8 +31,8 @@ if(params.debug) {
     // debug for now with small vcf
     params.vcf = "WI.20220216.small.hard-filter.isotype.vcf.gz"
 
-    vcf_file = Channel.fromPath("${params.binDir}/input_data/test_data/WI.20220216.small.hard-filter.isotype.vcf.gz")
-    vcf_index = Channel.fromPath("${params.binDir}/input_data/test_data/WI.20220216.small.hard-filter.isotype.vcf.gz.tbi")
+    vcf_file = Channel.fromPath("/projects/b1059/data/${params.species}/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz")
+    vcf_index = Channel.fromPath("/projects/b1059/data/${params.species}/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz.tbi")
     params.traitfile = "${params.binDir}/input_data/test_data/ExampleTraitData.tsv"
 
     // lower number of reps for debug
