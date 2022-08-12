@@ -38,11 +38,6 @@
                     "type": "boolean"
                 }
             },
-            "required": [
-                "vcf",
-                "species",
-                "traitfile"
-            ],
             "fa_icon": "fas fa-terminal"
         },
         "parameters": {
