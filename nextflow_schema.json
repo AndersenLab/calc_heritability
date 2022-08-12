@@ -33,6 +33,9 @@
                 "traitfile": {
                     "type": "string",
                     "description": "Full path to a file containing trait information"
+                },
+                "debug": {
+                    "type": "boolean"
                 }
             },
             "required": [
