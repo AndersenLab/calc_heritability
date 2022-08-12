@@ -1,0 +1,3 @@
+reports:
+    "**/hert_report_**.html":
+        display: "Heritability Report"
