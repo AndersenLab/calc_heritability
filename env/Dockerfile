@@ -10,7 +10,7 @@ RUN conda install -c bioconda bcftools=1.9
 RUN conda install -c conda-forge pandoc=2.12
 RUN conda install -c bioconda plink=1.90b6.12
 RUN conda install -c bioconda bedtools=2.29.2
-# RUN conda install -c conda-forge r=3.6.0
+RUN conda install -c conda-forge r=3.6.0
 
 
 
