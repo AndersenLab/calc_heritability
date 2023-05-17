@@ -1,8 +1,10 @@
 FROM rocker/tidyverse:3.6.0
 MAINTAINER Katie Evans <katiesevans9@gmail.com>
 
-RUN Rscript -e "install.packages(c('boot', 'sommer', 'futile.logger', 'remotes'), dependencies=TRUE, repos='http://cran.us.r-project.org')"
+RUN Rscript -e "install.packages(c('boot', 'futile.logger', 'remotes', 'devtools'), dependencies=TRUE, repos='http://cran.us.r-project.org')"
 RUN Rscript -e "remotes::install_github('lme4/lme4', build_vignettes=FALSE)"
+RUN Rscript -e "devtools::install_version('sommer', version = '4.0.4', repos = 'http://cran.us.r-project.org')"
+
 
 
 
