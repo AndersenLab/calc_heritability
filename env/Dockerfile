@@ -1,4 +1,4 @@
-FROM rocker/tidyverse
+FROM rocker/tidyverse:3.6.0
 MAINTAINER Katie Evans <katiesevans9@gmail.com>
 
 RUN Rscript -e "install.packages(c('boot', 'sommer', 'lme4', 'futile.logger'), dependencies=TRUE, repos='http://cran.us.r-project.org')"
