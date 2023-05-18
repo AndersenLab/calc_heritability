@@ -9,8 +9,6 @@ if( !nextflow.version.matches('20+') ) {
 nextflow.preview.dsl=2
 
 date = new Date().format( 'yyyyMMdd' )
-// reps = 10000
-params.reps = 500
 params.binDir = "${workflow.projectDir}"
 params.species = "c_elegans"
 params.fix = "fix"
@@ -36,20 +34,23 @@ if(params.debug) {
     params.traitfile = "${params.binDir}/input_data/test_data/ExampleTraitData.csv"
 
     // lower number of reps for debug
-    param.reps = 10
+    params.reps = 10
         
 } else if(params.gcp) { 
     // use the data directly from google on gcp
     vcf_file = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/${params.species}/${params.vcf}/variation/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz")
     vcf_index = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/${params.species}/${params.vcf}/variation/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz.tbi")
+    params.reps = 500
 
 } else if(!params.vcf) {
     // if there is no VCF date provided, pull the latest vcf from cendr.
     params.vcf = "20220216"
     download_vcf = true
-    
+    params.reps = 500
+
 } else {
     // use the vcf data from QUEST when a cendr date is provided
+    params.reps = 500
 
     // Check that params.vcf is valid
     if("${params.vcf}" == "20220216" || "${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531" || "${params.vcf}" == "20210901" || "${params.vcf}" == "20210803") {
@@ -293,7 +294,7 @@ process vcf_to_geno_matrix {
 process heritability {
 
     label "medium"
-    container "andersenlab/heritability:2023051811191751cbb7"
+    container "andersenlab/heritability:20230518115424d51b40"
 
 	publishDir "${params.out}/", mode: 'copy'
 

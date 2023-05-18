@@ -5,7 +5,8 @@
 ###################################################################################################################
 
 DEFAULT_DATA_DIR="gs://nf-pipelines/heritability/"
-DEFAULT_VCF_VERSION="20210121"
+DEFAULT_VCF_VERSION="20220216"
+DEFAULT_SPECIES='c_elegans'
 DEFAULT_GOOGLE_PROJECT="andersen-lab"
 DEFAULT_GOOGLE_ZONE="us-central1-a"
 DEFAULT_GOOGLE_SERVICE_ACCOUNT_EMAIL="nscalc-201573431837@andersen-lab.iam.gserviceaccount.com"
@@ -14,6 +15,11 @@ DEFAULT_GOOGLE_SERVICE_ACCOUNT_EMAIL="nscalc-201573431837@andersen-lab.iam.gserv
 if [[ -z "${VCF_VERSION}" ]]; then
   VCF_VERSION=${DEFAULT_VCF_VERSION}
   echo "VCF_VERSION environment variable is not set - defaulting to ${VCF_VERSION}"
+fi
+
+if [[ -z "${SPECIES}" ]]; then
+  SPECIES=${DEFAULT_SPECIES}
+  echo "SPECIES environment variable is not set - defaulting to ${DEFAULT_SPECIES}"
 fi
 
 if [[ -z "${DATA_DIR}" ]]; then
@@ -61,6 +67,7 @@ nextflow run main.nf \
   --google_service_account_email "${GOOGLE_SERVICE_ACCOUNT_EMAIL}" \
   --traitfile "${TRAIT_FILE}" \
   --vcf "${VCF_VERSION}" \
+  --species "${SPECIES}" \
   --work_dir "${WORK_DIR}" \
   --out "${OUTPUT_DIR}" \
   --binDir "${DATA_DIR}"
