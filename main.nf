@@ -36,15 +36,12 @@ if(params.debug) {
     params.traitfile = "${params.binDir}/input_data/test_data/ExampleTraitData.csv"
 
     // lower number of reps for debug
-    reps = 10
+    param.reps = 10
         
 } else if(params.gcp) { 
     // use the data directly from google on gcp
-    // vcf_file = Channel.fromPath("gs://elegansvariation.org/releases/20220216/variation/WI.20220216.small.hard-filter.isotype.vcf.gz")
-    // vcf_index = Channel.fromPath("gs://elegansvariation.org/releases/20220216/variation/WI.20220216.small.hard-filter.isotype.vcf.gz.tbi")
-
-    vcf_file = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/c_elegans/20220216/variation//WI.20220216.small.hard-filter.isotype.vcf.gz")
-    vcf_index = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/c_elegans/20220216/variation//WI.20220216.small.hard-filter.isotype.vcf.gz.tbi")
+    vcf_file = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/${params.species}/${params.vcf}/variation/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz")
+    vcf_index = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/${params.species}/${params.vcf}/variation/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz.tbi")
 
 } else if(!params.vcf) {
     // if there is no VCF date provided, pull the latest vcf from cendr.
@@ -97,7 +94,7 @@ if(params.debug) {
         } else {
             // if it DOES exist
             println """
-            WARNING: Using a non-CeNDR VCF for analysis. 
+            WARNING: Using a non-CaeNDR VCF for analysis. 
             """
             vcf_file = Channel.fromPath("${params.vcf}")
             vcf_index = Channel.fromPath("${params.vcf}.tbi")
@@ -172,24 +169,15 @@ workflow {
 
 process pull_vcf {
 
-    tag {"PULLING VCF FROM CeNDR"}
+    tag {"PULLING VCF FROM CaeNDR"}
 
     output:
         path "*hard-filter.isotype.vcf.gz", emit: hard_vcf 
         path "*hard-filter.isotype.vcf.gz.tbi", emit: hard_vcf_index 
-        path "*impute.isotype.vcf.gz", emit: impute_vcf 
-        path "*impute.isotype.vcf.gz.tbi", emit: impute_vcf_index 
-        path "*.strain-annotation*.tsv", emit: ann_vcf
 
     """
-        wget https://storage.googleapis.com/elegansvariation.org/releases/${params.vcf}/variation/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz
+        wget https://storage.googleapis.com/caendr-site-public-bucket/dataset_release/${params.species}/${params.vcf}/variation/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz
         tabix -p vcf WI.${params.vcf}.small.hard-filter.isotype.vcf.gz
-
-        wget https://storage.googleapis.com/elegansvariation.org/releases/${params.vcf}/variation/WI.${params.vcf}.impute.isotype.vcf.gz
-        tabix -p vcf WI.${params.vcf}.impute.isotype.vcf.gz
-
-        wget https://storage.googleapis.com/elegansvariation.org/releases/${params.vcf}/variation/WI.${params.vcf}.strain-annotation.bcsq.tsv
-
     """
 }
 
@@ -305,6 +293,7 @@ process vcf_to_geno_matrix {
 process heritability {
 
     label "medium"
+    container "andersenlab/heritability:2023051811191751cbb7"
 
 	publishDir "${params.out}/", mode: 'copy'
 

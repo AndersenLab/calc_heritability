@@ -5,12 +5,10 @@ on:
   push:
     paths:
     - 'env/Dockerfile'
-    - 'env/conda.yml'
     - '.github/workflows/build_docker.yml'
   pull_request:
     paths:
     - 'env/Dockerfile'
-    - 'env/conda.yml'
     - '.github/workflows/build_docker.yml'
 
 jobs:

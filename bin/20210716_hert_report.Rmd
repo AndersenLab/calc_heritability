@@ -10,7 +10,13 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+library(readr)
+library(glue)
+library(purrr)
 library(data.table)
 
 hert <- data.table::fread("heritability_result.tsv")
