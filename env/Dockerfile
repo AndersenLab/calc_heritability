@@ -1,7 +1,26 @@
-FROM rocker/tidyverse:3.6.0
-MAINTAINER Katie Evans <katiesevans9@gmail.com>
+FROM continuumio/miniconda
+MAINTAINER Katie Evans <kathryn.evans@northwestern.edu>
 
-RUN Rscript -e "install.packages(c('futile.logger', 'remotes', 'devtools'), dependencies=TRUE, repos='http://cran.us.r-project.org')"
-RUN Rscript -e "remotes::install_github('lme4/lme4', build_vignettes=FALSE)"
-RUN Rscript -e "remotes::install_version('sommer', version = '4.0.4', repos = 'http://cran.us.r-project.org')"
-RUN Rscript -e "remotes::install_version('boot', version = '1.3-28', repos = 'http://cran.us.r-project.org')"
+COPY conda.yml .
+
+RUN conda install mamba -n base -c conda-forge
+
+RUN mamba env update -n root -f conda.yml \
+&& mamba clean -a
+
+RUN Rscript -e "install.packages('valr', dependencies=TRUE, repos='http://cran.us.r-project.org')"
+
+# install other tools not avalible on conda cloud
+RUN apt-get --allow-releaseinfo-change update && apt-get install -y procps  
+
+RUN mamba install -c conda-forge r-fuzzyjoin
+RUN mamba install -c bioconda bioconductor-iranges
+
+# RUN Rscript -e "install.packages('roperators',dependencies=TRUE, repos='http://cran.us.r-project.org')"
+# RUN Rscript -e "install.packages('tidyverse', dependencies=TRUE, repos='http://cran.us.r-project.org')"
+# RUN conda install -c conda-forge r-tidyverse
+# RUN conda install r-valr
+# RUN Rscript -e "devtools::install_version('tidyverse',version='1.3.1', dependencies = TRUE, repos = 'http://cran.us.r-project.org')"
+RUN Rscript -e "remotes::install_version('dplyr', version = '1.0.4', repos = 'http://cran.us.r-project.org')"
+
+RUN mamba install -c conda-forge mscorefonts
