@@ -10,9 +10,13 @@ nextflow.enable.dsl=2
 
 date = new Date().format( 'yyyyMMdd' )
 params.binDir = "${workflow.projectDir}"
-params.species = "c_elegans"
 params.fix = "fix"
 params.maf = 0.05
+
+// default to C. elegans if no species given
+if(!params.species) {
+    params.species = "c_elegans"
+}
 
 /*
 ~ ~ ~ > * Parameters
