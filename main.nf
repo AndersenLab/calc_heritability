@@ -6,7 +6,7 @@ if( !nextflow.version.matches('20+') ) {
     exit 1
 }
 
-nextflow.preview.dsl=2
+nextflow.enable.dsl=2
 
 date = new Date().format( 'yyyyMMdd' )
 params.binDir = "${workflow.projectDir}"
