@@ -6,7 +6,7 @@
 
 DEFAULT_DATA_DIR="gs://nf-pipelines/heritability/"
 DEFAULT_VCF_VERSION="20220216"
-DEFAULT_SPECIES='c_elegans'
+DEFAULT_SPECIES="c_elegans"
 DEFAULT_GOOGLE_PROJECT="andersen-lab"
 DEFAULT_GOOGLE_ZONE="us-central1-a"
 DEFAULT_GOOGLE_SERVICE_ACCOUNT_EMAIL="nscalc-201573431837@andersen-lab.iam.gserviceaccount.com"
