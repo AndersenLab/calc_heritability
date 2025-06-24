@@ -19,14 +19,13 @@ jobs:
 
     # Build Tools
     - name: Build and Publish
-      uses: elgohr/Publish-Docker-Github-Action@master
+      uses: elgohr/Publish-Docker-Github-Action@v4
       with:
         name: andersenlab/heritability
-        tag: "${{ steps.current-time.formattedTime }}"
         username: ${{ secrets.KSE_DOCKER_USER }}
         password: ${{ secrets.KSE_DOCKER_PASS }}
         snapshot: true
         dockerfile: Dockerfile
         workdir: "env"
-        tags: "latest"
+        tags: "latest,${{ steps.current-time.formattedTime }}"
         cache: true
