@@ -1,26 +1,26 @@
-FROM continuumio/miniconda
-MAINTAINER Katie Evans <kathryn.evans@northwestern.edu>
+FROM mambaorg/micromamba:2.3.0
 
-COPY conda.yml .
-
-RUN conda install mamba -n base -c conda-forge
-
-RUN mamba env update -n root -f conda.yml \
-&& mamba clean -a
-
-RUN Rscript -e "install.packages('valr', dependencies=TRUE, repos='http://cran.us.r-project.org')"
-
+USER root
 # install other tools not avalible on conda cloud
 RUN apt-get --allow-releaseinfo-change update && apt-get install -y procps  
 
-RUN mamba install -c conda-forge r-fuzzyjoin
-RUN mamba install -c bioconda bioconductor-iranges
+COPY --chown=$MAMBA_USER:$MAMBA_USER conda.yml .
 
-# RUN Rscript -e "install.packages('roperators',dependencies=TRUE, repos='http://cran.us.r-project.org')"
-# RUN Rscript -e "install.packages('tidyverse', dependencies=TRUE, repos='http://cran.us.r-project.org')"
-# RUN conda install -c conda-forge r-tidyverse
-# RUN conda install r-valr
-# RUN Rscript -e "devtools::install_version('tidyverse',version='1.3.1', dependencies = TRUE, repos = 'http://cran.us.r-project.org')"
+RUN micromamba install -y -n base -f conda.yml \
+&& micromamba clean -a
+
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+RUN Rscript -e "install.packages('valr', dependencies=TRUE, repos='http://cran.us.r-project.org')"
+
+RUN micromamba install -c conda-forge r-fuzzyjoin
+RUN micromamba install -c bioconda bioconductor-iranges
+
 RUN Rscript -e "remotes::install_version('dplyr', version = '1.0.4', repos = 'http://cran.us.r-project.org')"
 
-RUN mamba install -c conda-forge mscorefonts
+RUN micromamba install -c conda-forge mscorefonts
+RUN micromamba clean --all --yes
+
+USER $MAMBA_USER
+ENV PATH "/opt/conda/bin:$PATH"
+ENTRYPOINT source /usr/local/bin/_entrypoint.sh

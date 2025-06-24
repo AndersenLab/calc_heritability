@@ -1,4 +1,4 @@
-name: nemascan
+name: base
 channels:
   - defaults
   - bioconda
