@@ -2,7 +2,7 @@ FROM mambaorg/micromamba:2.3.0
 
 USER root
 # install other tools not avalible on conda cloud
-RUN apt-get --allow-releaseinfo-change update && apt-get install -y procps  
+RUN apt-get --allow-releaseinfo-change update && apt-get install -y procps libxrender1 libcairo2-dev 
 
 COPY --chown=$MAMBA_USER:$MAMBA_USER conda.yml .
 
