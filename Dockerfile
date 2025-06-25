@@ -9,21 +9,21 @@
 FROM google/cloud-sdk:slim
 
 # Install OpenJDK JRE for Nextflow
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends openjdk-11-jre wget procps
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends openjdk-17-jre wget procps
 
 LABEL Name="Heritability-NXF" Author="Katie Evans"
 
 # Specify Nextflow version and mode 
 # (21.05.0-edge is the first version to support configuring which service account acts as pipeline-runner)
-ENV NXF_VER=21.05.0-edge \
+ENV NXF_VER=23.10.1 \
   NXF_MODE=google \
-  NXF_EDGE=1
+  NXF_EDGE=0
 
 WORKDIR /heritability
 
 # Run the Nextflow install script (version and mode must be piped in to bash during install 
 # or nextflow will initially download the latest version and only download and switch to NXF_VER when the container runs)
-RUN NXF_VER=21.05.0-edge NXF_MODE=google NXF_EDGE=1 \
+RUN NXF_VER=23.10.1 NXF_MODE=google NXF_EDGE=0 \
     wget -qO- https://get.nextflow.io | bash
 
 COPY heritability-nxf.sh /heritability/heritability-nxf.sh

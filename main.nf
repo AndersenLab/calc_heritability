@@ -57,10 +57,10 @@ if(params.debug) {
     params.reps = 500
 
     // Check that params.vcf is valid
-    if("${params.vcf}" == "20220216" || "${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531" || "${params.vcf}" == "20210901" || "${params.vcf}" == "20210803") {
+    if("${params.vcf}" == "20220216" || "${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531" || "${params.vcf}" == "20210901" || "${params.vcf}" == "20210803" || "${params.vcf}" == "20250625" || "${params.vcf}" == "20250626" || "${params.vcf}" == "20250627") {
         // if("${params.vcf}" in ["20210121", "20200815", "20180527", "20170531", "20210901"]) {
         // check to make sure 20210901 is tropicalis
-        if("${params.vcf}" == "20210901") {
+        if("${params.vcf}" == "20210901" || "${params.vcf}" == "20250627") {
             if("${params.species}" == "c_elegans" || "${params.species}" == "c_briggsae") {
                 println """
                 Error: VCF file (${params.vcf}) does not match species ${params.species} (should be c_tropicalis). Please enter a new vcf date or a new species to continue.
@@ -69,7 +69,7 @@ if(params.debug) {
             }
         }
         // check to make sure vcf matches species for briggsae
-        if("${params.vcf}" == "20210803") {
+        if("${params.vcf}" == "20210803" || "${params.vcf}" == "20250626") {
             if("${params.species}" == "c_elegans" || "${params.species}" == "c_tropicalis") {
                 println """
                 Error: VCF file (${params.vcf}) does not match species ${params.species} (should be c_briggsae). Please enter a new vcf date or a new species to continue.
@@ -78,7 +78,7 @@ if(params.debug) {
             }
         }
         // check to make sure vcf matches species for elegans
-        if("${params.vcf}" == "20220216" || "${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531") {
+        if("${params.vcf}" == "20220216" || "${params.vcf}" == "20210121" || "${params.vcf}" == "20200815" || "${params.vcf}" == "20180527" || "${params.vcf}" == "20170531" || "${params.vcf}" == "20250625") {
             if("${params.species}" == "c_briggsae" || "${params.species}" == "c_tropicalis") {
                 println """
                 Error: VCF file (${params.vcf}) does not match species ${params.species} (should be c_elegans). Please enter a new vcf date or a new species to continue.
@@ -87,8 +87,8 @@ if(params.debug) {
             }
         }
         // use the vcf data from QUEST when a cendr date is provided
-        vcf_file = Channel.fromPath("/projects/b1059/data/${params.species}/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz")
-        vcf_index = Channel.fromPath("/projects/b1059/data/${params.species}/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz.tbi")
+        vcf_file = Channel.fromPath("/vast/data/${params.species}/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz")
+        vcf_index = Channel.fromPath("/vast/data/${params.species}/WI/variation/${params.vcf}/vcf/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz.tbi")
     } else {
         // check that vcf file exists, if it does, use it. If not, throw error
         if (!file("${params.vcf}").exists()) {
@@ -130,12 +130,12 @@ workflow {
         Channel.fromPath("${params.traitfile}")
             .combine(Channel.fromPath("${params.binDir}/input_data/${params.species}/strain_isotype_lookup.tsv"))
             .combine(Channel.fromPath("${params.binDir}/bin/Fix_Isotype_names_bulk_h2.R"))
-            .combine(Channel.from("false")) | fix_strain_names_bulk 
+            .combine(Channel.of("false")) | fix_strain_names_bulk 
     } else {
         Channel.fromPath("${params.traitfile}")
             .combine(Channel.fromPath("${params.binDir}/input_data/${params.species}/strain_isotype_lookup.tsv"))
             .combine(Channel.fromPath("${params.binDir}/bin/Fix_Isotype_names_bulk_h2.R"))
-            .combine(Channel.from("${params.fix}")) | fix_strain_names_bulk 
+            .combine(Channel.of("${params.fix}")) | fix_strain_names_bulk 
     }
            
     traits_to_map = fix_strain_names_bulk.out.fixed_strain_phenotypes
@@ -151,7 +151,7 @@ workflow {
     // calclate heritability and generate report output
     traits_to_map 
     	.combine(vcf_to_geno_matrix.out)
-        .combine(Channel.from("${params.reps}"))
+        .combine(Channel.of("${params.reps}"))
         .combine(Channel.fromPath("${params.binDir}/bin/20210716_H2_script.R")) | heritability
 
     //generate html report
@@ -298,7 +298,6 @@ process vcf_to_geno_matrix {
 process heritability {
 
     label "medium"
-    container "andersenlab/heritability:20230518115424d51b40"
 
 	publishDir "${params.out}/", mode: 'copy'
 
