@@ -4,7 +4,6 @@
 #
 ###################################################################################################################
 
-DEFAULT_DATA_DIR="/heritability"
 DEFAULT_VCF_VERSION="20220216"
 DEFAULT_SPECIES="c_elegans"
 DEFAULT_GOOGLE_PROJECT="andersen-lab"
@@ -20,11 +19,6 @@ fi
 if [[ -z "${SPECIES}" ]]; then
   SPECIES=${DEFAULT_SPECIES}
   echo "SPECIES environment variable is not set - defaulting to ${DEFAULT_SPECIES}"
-fi
-
-if [[ -z "${DATA_DIR}" ]]; then
-  DATA_DIR=${DEFAULT_DATA_DIR}
-  echo "DATA_DIR environment variable is not set - defaulting to ${DATA_DIR}"
 fi
 
 if [[ -z "${GOOGLE_PROJECT}" ]]; then
@@ -69,7 +63,6 @@ echo "vcf:                          ${VCF_VERSION}"
 echo "species:                      ${SPECIES}"
 echo "work_dir:                     ${WORK_DIR}"
 echo "out:                          ${OUTPUT_DIR}"
-echo "binDir:                       ${DATA_DIR}"
 
 nextflow run main.nf \
   -profile gcp \
@@ -80,5 +73,4 @@ nextflow run main.nf \
   --vcf "${VCF_VERSION}" \
   --species "${SPECIES}" \
   --work_dir "${WORK_DIR}" \
-  --out "${OUTPUT_DIR}" \
-  --binDir "${DATA_DIR}"
+  --out "${OUTPUT_DIR}"
