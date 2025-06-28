@@ -4,7 +4,7 @@
 #
 ###################################################################################################################
 
-DEFAULT_DATA_DIR="gs://nf-pipelines/heritability/"
+DEFAULT_DATA_DIR="/heritability"
 DEFAULT_VCF_VERSION="20220216"
 DEFAULT_SPECIES="c_elegans"
 DEFAULT_GOOGLE_PROJECT="andersen-lab"
@@ -59,6 +59,17 @@ if [[ -z "${WORK_DIR}" ]]; then
   exit 1
 fi
 
+  
+echo "profile:                      gcp"
+echo "google_project:               ${GOOGLE_PROJECT}"
+echo "google_zone:                  ${GOOGLE_ZONE}"
+echo "google_service_account_email: ${GOOGLE_SERVICE_ACCOUNT_EMAIL}"
+echo "traitfile:                    ${TRAIT_FILE}"
+echo "vcf:                          ${VCF_VERSION}"
+echo "species:                      ${SPECIES}"
+echo "work_dir:                     ${WORK_DIR}"
+echo "out:                          ${OUTPUT_DIR}"
+echo "binDir:                       ${DATA_DIR}"
 
 nextflow run main.nf \
   -profile gcp \

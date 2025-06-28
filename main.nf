@@ -172,6 +172,7 @@ workflow {
 ==============================================
 */
 
+
 process pull_vcf {
 
     tag {"PULLING VCF FROM CaeNDR"}
@@ -248,7 +249,7 @@ process vcf_to_geno_matrix {
 
     """
         bcftools view -S ${strains} -Ou ${vcf} |\\
-        bcftools filter -i N_MISSING=0 -Oz --threads 5 -o Phenotyped_Strain_VCF.vcf.gz
+        bcftools filter -e 'sSum(FORMAT/GT="./.") > 0' -Oz --threads 5 -o Phenotyped_Strain_VCF.vcf.gz
         tabix -p vcf Phenotyped_Strain_VCF.vcf.gz
         plink --vcf Phenotyped_Strain_VCF.vcf.gz \\
               --threads 5 \\

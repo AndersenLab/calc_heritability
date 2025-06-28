@@ -30,6 +30,7 @@ COPY heritability-nxf.sh /heritability/heritability-nxf.sh
 COPY nextflow.config /heritability/nextflow.config
 COPY main.nf /heritability/main.nf
 COPY bin/* /heritability/bin/
+COPY input_data/* /heritability/input_data/
 
 # add nextflow and nemarun directory to te system path and make them executable
 ENV PATH="/heritability:${PATH}"

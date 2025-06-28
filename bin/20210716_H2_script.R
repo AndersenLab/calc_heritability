@@ -12,9 +12,9 @@ library(data.table)
 # Heritability
 # data is data frame that contains strain and Value column
 # indicies are used by the boot function to sample from the 'data' data.frame
-H2.test.boot <- function(data, indicies){
+H2.test.boot <- function(data, indices){
     
-    d <- data[indicies,]
+    d <- data[indices,]
     
     pheno <- as.data.frame(dplyr::select(d, Value))[,1]
     
@@ -53,13 +53,13 @@ H2.test <- function(data){
 }
 
 # narrow sense heritability with sommer::mmer (with bootstrap)
-narrowh2.boot <- function(data, indicies){
+narrowh2.boot <- function(data, indices){
     
-    d <- data[indicies,]
+    d <- data[indices,]
     
-    h2_res <- sommer::mmer(Value ~ 1, random = ~sommer::vs(strain, Gu = A), data = d)
+    h2_res <- sommer::mmes(Value ~ 1, random = ~sommer::vsm(sommer::ism(strain), Gu = A), data = d)
     
-    h2 <- as.numeric(sommer::pin(h2_res, h2 ~ (V1) / (V1+V2))[[1]][1])
+    h2 <- as.numeric(sommer::vpredict(h2_res, h2 ~ (V1) / (V1+V2))[[1]][1])
     
     return(h2)
     
@@ -68,9 +68,9 @@ narrowh2.boot <- function(data, indicies){
 # narrow sense heritability with sommer::mmer (no bootstrap)
 narrowh2 <- function(df_h){
     
-    h2_res <- sommer::mmer(Value ~ 1, random = ~sommer::vs(strain, Gu = A), data = df_h)
+    h2_res <- sommer::mmes(Value ~ 1, random = ~sommer::vsm(sommer::ism(strain), Gu = A), data = df_h)
     
-    h2 <- as.numeric(sommer::pin(h2_res, h2 ~ (V1) / (V1+V2))[[1]][1])
+    h2 <- as.numeric(sommer::vpredict(h2_res, h2 ~ (V1) / (V1+V2))[[1]][1])
     
     return(h2)
     
@@ -113,23 +113,6 @@ H2.calc <- function(data, boot = TRUE, type = "broad", reps = 500){
 
 # RUN
 args = commandArgs(trailingOnly=TRUE)
-
-
-# setwd(glue::glue("{dirname(rstudioapi::getActiveDocumentContext()$path)}/"))
-# 
-# input_data <- read.csv("ExampleTraitData.csv")
-# output_fname <- "test"
-# hash <- NA
-# heritability_version <- 2
-# data <- input_data %>%
-#     tidyr::spread(TraitName, Value) %>%
-#     dplyr::select(-Replicate, -AssayNumber) %>%
-#     dplyr::rename(strain = Strain)
-# # load genotype matrix
-# geno_matrix <- data.table::fread("20210121_hard.filter_genomatrix.tsv")%>%
-#     na.omit()
-# strain_data <- dplyr::collect(cegwas2:::get_db("strain"))
-
 
 # args <- NULL
 # args[1] <- "ExampleTraitData.csv"
@@ -198,12 +181,6 @@ if(!is.data.frame(result_narrow) || nrow(result_narrow) == 0) {
 # # combine broad and narrow into one dataframe
 result <- rbind(result_broad, result_narrow) %>%
     dplyr::select(type, H2, ci_l, ci_r)
-
-
-# result$hash <- hash
-# result$trait_name <- data$TraitName[1]
-# result$date <- Sys.time()
-# result$heritability_version <- heritability_version
 
 # Write the result
 readr::write_tsv(result, "heritability_result.tsv")
