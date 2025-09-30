@@ -42,8 +42,8 @@ if(params.debug) {
         
 } else if(params.gcp) { 
     // use the data directly from google on gcp
-    vcf_file = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/${params.species}/${params.vcf}/variation/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz")
-    vcf_index = Channel.fromPath("gs://caendr-site-public-bucket/dataset_release/${params.species}/${params.vcf}/variation/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz.tbi")
+    vcf_file = Channel.fromPath("gs://${params.data_bucket}/tool_release_data/${params.species}/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz")
+    vcf_index = Channel.fromPath("gs://${params.data_bucket}/tool_release_data/${params.species}/WI.${params.vcf}.small.hard-filter.isotype.vcf.gz.tbi")
     params.reps = 500
 
 } else if(!params.vcf) {
